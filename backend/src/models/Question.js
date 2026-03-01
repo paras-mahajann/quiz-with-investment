@@ -1,19 +1,13 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const questionSchema = new mongoose.Schema({
-    question:{
-        type:String,
-        required:true
-    },
-    questionId:String,
-    ans:{
-        type:String,
-        required:true
-    },
-    difficulty:String
-
+  questionId: { type: String, unique: true, sparse: true },
+  question: String,
+  options: [String],
+  correctAnswer: String,
+  difficulty: String,
+  isActive: { type: Boolean, default: false },
+  startTime: Date
 });
 
-const questionModel = mongoose.model('questions',questionSchema);
-
-module.exports = questionModel;
+module.exports = mongoose.model("Question", questionSchema);

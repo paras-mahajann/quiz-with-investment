@@ -1,14 +1,9 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const participantSchema = new mongoose.Schema({
-    teamId:{
-        type:String,
-        unique:[true,"you cannot make team with this team id"]
-    },
-    password:String,
-    balance:Number,
-})
+  teamId: String,
+  password: String,
+  balance: { type: Number, default: 1000 }
+});
 
-const participantModel = mongoose.model('Participant',participantSchema);
-
-module.exports = participantModel;
+module.exports = mongoose.model("Participant", participantSchema);

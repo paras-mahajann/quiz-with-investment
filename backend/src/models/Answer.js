@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 
 const answersSchema = new mongoose.Schema({
-    team_id:String,
+    teamId:String,
     questionId:String,
     selectedOption:String,
     tier:Number,
@@ -13,3 +13,5 @@ const answersSchema = new mongoose.Schema({
 const answersModel = mongoose.model('Answers',answersSchema);
 
 module.exports = answersModel;
+
+

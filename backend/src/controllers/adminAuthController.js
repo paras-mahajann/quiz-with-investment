@@ -31,10 +31,11 @@ const adminRegisterController = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, {
+    res.cookie('token', token, {
       httpOnly: true,
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000
+      secure:true,
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000
     });
 
     res.status(201).json({
@@ -79,10 +80,11 @@ const adminLoginController = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie("token", token, {
+    res.cookie('token', token, {
       httpOnly: true,
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000
+      secure:true,
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000
     });
 
     res.status(200).json({

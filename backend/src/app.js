@@ -17,6 +17,10 @@ app.use('/api/auth',authRoutes);
 app.use('/api/participant',participantRoutes);
 app.use('/api/admin',adminRoutes);
 
+app.use('/',(req,res)=>{
+    res.send('Quiz Investment Backend is running...')
+});
+
 
 
 

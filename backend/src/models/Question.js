@@ -6,6 +6,7 @@ const questionSchema = new mongoose.Schema({
   options: [String],
   correctAnswer: String,
   difficulty: String,
+  durationSeconds: { type: Number, default: 30 },
   isActive: { type: Boolean, default: false },
   startTime: Date
 });

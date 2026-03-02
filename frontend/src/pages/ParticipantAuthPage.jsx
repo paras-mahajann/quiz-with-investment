@@ -7,7 +7,6 @@ import { participantApi } from "../lib/api";
 const EMPTY_FORM = { teamId: "", password: "" };
 
 function ParticipantAuthPage() {
-  const [mode, setMode] = useState("login");
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -20,8 +19,7 @@ function ParticipantAuthPage() {
     setLoading(true);
 
     try {
-      const api = mode === "login" ? participantApi.login : participantApi.register;
-      const data = await api(form);
+      const data = await participantApi.login(form);
       loginAsParticipant(data.participant);
       navigate("/participant/game");
     } catch (err) {
@@ -32,26 +30,9 @@ function ParticipantAuthPage() {
   };
 
   return (
-    <AppShell title="Participant Access" subtitle="Login or create a team account.">
+    <AppShell title="Participant Access" subtitle="Login with credentials shared by admin.">
       <div className="auth-wrapper">
         <form className="auth-card" onSubmit={onSubmit}>
-          <div className="switch-row">
-            <button
-              className={`switch-btn ${mode === "login" ? "active" : ""}`}
-              type="button"
-              onClick={() => setMode("login")}
-            >
-              Login
-            </button>
-            <button
-              className={`switch-btn ${mode === "register" ? "active" : ""}`}
-              type="button"
-              onClick={() => setMode("register")}
-            >
-              Register
-            </button>
-          </div>
-
           <label>
             Team ID
             <input
@@ -76,7 +57,7 @@ function ParticipantAuthPage() {
           {error ? <p className="error-text">{error}</p> : null}
 
           <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading ? "Please wait..." : mode === "login" ? "Login" : "Create Team"}
+            {loading ? "Please wait..." : "Login"}
           </button>
         </form>
       </div>

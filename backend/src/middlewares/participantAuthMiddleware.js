@@ -17,6 +17,14 @@ const participantAuthMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: "Participant not found" });
     }
 
+    // Track online presence by recent authenticated activity.
+    const now = new Date();
+    await Participant.updateOne(
+      { _id: participant._id },
+      { $set: { lastSeenAt: now } }
+    );
+    participant.lastSeenAt = now;
+
     req.participant = participant;
     next();
   } catch (err) {

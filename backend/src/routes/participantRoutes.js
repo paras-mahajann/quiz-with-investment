@@ -5,7 +5,7 @@ const participantAuthController = require('../controllers/participantAuthControl
 
 const participantAuthMiddleware = require('../middlewares/participantAuthMiddleware')
 
-const {submitAnswerController,getDashboard} = require('../controllers/gameController')
+const {submitAnswerController,getDashboard,getCurrentQuestion} = require('../controllers/gameController')
 
 
 
@@ -16,6 +16,8 @@ router.get('/dashboard',participantAuthMiddleware,getDashboard)
 router.post('/register',participantAuthController.registerController);
 
 router.post('/login',participantAuthController.loginController)
+
+router.get('/current-question',participantAuthMiddleware,getCurrentQuestion);
 
 
 

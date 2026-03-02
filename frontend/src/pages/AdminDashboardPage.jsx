@@ -12,6 +12,11 @@ const EMPTY_FORM = {
   difficulty: "",
   durationSeconds: "30"
 };
+const EMPTY_PARTICIPANT_FORM = {
+  teamId: "",
+  password: "",
+  balance: "1000"
+};
 
 function AdminDashboardPage() {
   const { logout } = useAuth();
@@ -26,6 +31,7 @@ function AdminDashboardPage() {
   const [message, setMessage] = useState("");
   const [activePanel, setActivePanel] = useState("dashboard");
   const [defaultBalanceInput, setDefaultBalanceInput] = useState("1000");
+  const [participantForm, setParticipantForm] = useState(EMPTY_PARTICIPANT_FORM);
 
   const parsedOptions = useMemo(
     () => form.options.split("\n").map((s) => s.trim()).filter(Boolean),
@@ -160,6 +166,33 @@ function AdminDashboardPage() {
     });
   };
 
+  const registerParticipant = async (event) => {
+    event.preventDefault();
+    const teamId = participantForm.teamId.trim();
+    const password = participantForm.password.trim();
+    const normalizedBalance = Number(participantForm.balance);
+
+    if (!teamId || !password) {
+      setError("Team ID and password are required.");
+      return;
+    }
+
+    if (!Number.isFinite(normalizedBalance) || normalizedBalance < 0) {
+      setError("Participant balance must be a non-negative number.");
+      return;
+    }
+
+    await withAction(async () => {
+      const data = await adminApi.createParticipant({
+        teamId,
+        password,
+        balance: normalizedBalance
+      });
+      setMessage(data.message || "Participant registered.");
+      setParticipantForm(EMPTY_PARTICIPANT_FORM);
+    });
+  };
+
   return (
     <AppShell title="Admin Dashboard" subtitle="Manage questions, game state, and leaderboard.">
       {message ? <p className="ok-text">{message}</p> : null}
@@ -288,6 +321,55 @@ function AdminDashboardPage() {
         </>
       ) : (
         <>
+          <section className="card">
+            <h2>Register Participant</h2>
+            <form className="stack-form" onSubmit={registerParticipant}>
+              <div className="grid two-col">
+                <label>
+                  Team ID
+                  <input
+                    value={participantForm.teamId}
+                    onChange={(e) =>
+                      setParticipantForm((prev) => ({ ...prev, teamId: e.target.value }))
+                    }
+                    placeholder="team-01"
+                    required
+                  />
+                </label>
+                <label>
+                  Initial Balance
+                  <input
+                    type="number"
+                    min="0"
+                    value={participantForm.balance}
+                    onChange={(e) =>
+                      setParticipantForm((prev) => ({ ...prev, balance: e.target.value }))
+                    }
+                    placeholder="1000"
+                    required
+                  />
+                </label>
+              </div>
+
+              <label>
+                Password
+                <input
+                  type="password"
+                  value={participantForm.password}
+                  onChange={(e) =>
+                    setParticipantForm((prev) => ({ ...prev, password: e.target.value }))
+                  }
+                  placeholder="Set participant password"
+                  required
+                />
+              </label>
+
+              <button className="btn btn-primary" type="submit" disabled={actionLoading}>
+                {actionLoading ? "Saving..." : "Register Participant"}
+              </button>
+            </form>
+          </section>
+
           <section className="card">
             <h2>Add Question</h2>
             <form className="stack-form" onSubmit={submitQuestion}>

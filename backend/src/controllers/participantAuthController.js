@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 
 const loginController = async (req, res) => {
   try {
-    const { teamId, password } = req.body;
+    const { password } = req.body;
+    const teamId = String(req.body?.teamId || "").trim();
 
     if (!teamId || !password) {
       return res.status(400).json({ message: "All fields required" });
@@ -20,6 +21,9 @@ const loginController = async (req, res) => {
     if (user.password !== hash) {
       return res.status(401).json({ message: "Invalid Password!" });
     }
+
+    user.lastSeenAt = new Date();
+    await user.save();
 
     const token = jwt.sign(
       { id: user._id, teamId: user.teamId },
@@ -48,48 +52,50 @@ const loginController = async (req, res) => {
 };
 
 const registerController = async (req, res) => {
+  return res.status(403).json({
+    message: "Participant self-registration is disabled. Contact admin."
+  });
+};
+
+const registerParticipantByAdminController = async (req, res) => {
   try {
-    const { teamId, password } = req.body;
+    const { password, balance } = req.body;
+    const teamId = String(req.body?.teamId || "").trim();
 
     if (!teamId || !password) {
-      return res.status(400).json({ message: "All fields required" });
+      return res.status(400).json({ message: "Team ID and password are required" });
     }
 
-    const isUserExist = await participantModel.findOne({ teamId });
-    if (isUserExist) {
+    const existing = await participantModel.findOne({ teamId });
+    if (existing) {
       return res.status(409).json({ message: "Team already registered!" });
     }
 
-    const hash = crypto.createHash('sha256').update(password).digest('hex');
+    const hash = crypto.createHash("sha256").update(password).digest("hex");
+    const normalizedBalance = Number(balance);
+    const initialBalance = Number.isFinite(normalizedBalance) && normalizedBalance >= 0
+      ? normalizedBalance
+      : 1000;
 
     const user = await participantModel.create({
       teamId,
       password: hash,
-      balance: 1000,
-      totalInvested: 0
-    });
-
-    const token = jwt.sign(
-      { id: user._id, teamId: user.teamId },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      sameSite: "strict",
-      maxAge: 60 * 60 * 1000
+      balance: initialBalance,
+      totalInvested: 0,
+      lastSeenAt: new Date()
     });
 
     res.status(201).json({
-      message: "Team created successfully",
+      message: "Participant registered successfully",
       participant: {
         teamId: user.teamId,
         balance: user.balance
       }
     });
-
   } catch (err) {
+    if (err && err.code === 11000) {
+      return res.status(409).json({ message: "Team already registered!" });
+    }
     console.error(err);
     res.status(500).json({ message: "Server Error" });
   }
@@ -97,5 +103,6 @@ const registerController = async (req, res) => {
 
 module.exports = {
   loginController,
-  registerController
+  registerController,
+  registerParticipantByAdminController
 };

@@ -47,5 +47,6 @@ export const adminApi = {
   getDashboard: () => request("/api/admin/dashboard"),
   resetGame: () => request("/api/admin/game-reset", { method: "POST" }),
   setDefaultBalance: (payload) => request("/api/admin/set-default-balance", { method: "POST", body: payload }),
-  getCurrentQuestion: () => request("/api/admin/current-question")
+  getCurrentQuestion: () => request("/api/admin/current-question"),
+  createParticipant: (payload) => request("/api/admin/register-participant", { method: "POST", body: payload })
 };

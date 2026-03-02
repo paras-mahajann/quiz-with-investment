@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import { useAuth } from "../context/AuthContext";
 import { adminApi } from "../lib/api";
+import { subscribeToGameUpdates } from "../lib/socket";
 
 const EMPTY_FORM = {
   questionId: "",
@@ -73,6 +74,14 @@ function AdminDashboardPage() {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToGameUpdates(() => {
+      loadData();
+    });
+
+    return unsubscribe;
   }, []);
 
   const withAction = async (callback) => {

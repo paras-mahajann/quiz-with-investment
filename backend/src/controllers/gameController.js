@@ -2,6 +2,7 @@ const Question = require("../models/Question");
 const Answer = require("../models/Answer");
 const Participant = require("../models/Participant");
 const GameState = require('../models/GameState')
+const { emitGameEvent } = require("../socket");
 const mongoose = require("mongoose");
 
 /* ==============================
@@ -62,6 +63,10 @@ const pushQuestionController = async (req, res) => {
     res.json({
       message: "Question pushed successfully",
       question
+    });
+    emitGameEvent("question:pushed", {
+      questionId: String(question._id),
+      startedAt: question.startTime
     });
 
   } catch (err) {
@@ -150,6 +155,11 @@ const submitAnswerController = async (req, res) => {
     );
 
     res.json({ message: "Answer submitted successfully" });
+    emitGameEvent("answer:submitted", {
+      questionId: String(question._id),
+      teamId: participant.teamId,
+      investmentAmount: normalizedInvestmentAmount
+    });
 
   } catch (err) {
     if (err && err.code === 11000) {
@@ -226,6 +236,12 @@ const revealAnswerController = async (req, res) => {
       appliedCount,
       skippedLateCount,
       leaderboard
+    });
+    emitGameEvent("answer:revealed", {
+      questionId: String(question._id),
+      correctAnswer: question.correctAnswer,
+      appliedCount,
+      skippedLateCount
     });
 
   } catch (err) {
@@ -335,6 +351,7 @@ const resetGame = async (req, res) => {
       success: true,
       message: "Game reset successfully"
     });
+    emitGameEvent("game:reset", { success: true });
     
   } catch (error) {
     console.error("Reset Game Error:", error);
@@ -375,6 +392,11 @@ const setDefaultBalance = async (req, res) => {
       modifiedCount: updateResult.modifiedCount || 0,
       defaultBalance: normalizedBalance,
       onlineWindowSeconds: ONLINE_WINDOW_SECONDS
+    });
+    emitGameEvent("balance:default-applied", {
+      matchedCount: updateResult.matchedCount || 0,
+      modifiedCount: updateResult.modifiedCount || 0,
+      defaultBalance: normalizedBalance
     });
   } catch (error) {
     console.error("Set Default Balance Error:", error);

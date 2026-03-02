@@ -1,6 +1,7 @@
 const express = require('express')
 const cookieParser = require('cookie-parser')
 const cors = require('cors');
+const { corsOptions } = require('./config/corsOptions');
 
 
 const participantRoutes = require('./routes/participantRoutes')
@@ -10,19 +11,7 @@ const adminRoutes = require('./routes/adminRoutes')
 
 const app = express();
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // allow requests with no origin (Postman, mobile apps)
-    if (!origin) return callback(null, true);
-
-    if (origin.endsWith(".vercel.app")) {
-      return callback(null, true);
-    }
-
-    callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true
-}));
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());

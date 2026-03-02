@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import { useAuth } from "../context/AuthContext";
 import { participantApi } from "../lib/api";
+import { subscribeToGameUpdates } from "../lib/socket";
 
 const TIER_OPTIONS = [
   { value: 1, label: "Tier 1 (x2 / -25%)" },
@@ -117,9 +118,17 @@ function ParticipantGamePage() {
 
     const timer = setInterval(() => {
       loadData();
-    }, 8000);
+    }, 15000);
 
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToGameUpdates(() => {
+      loadData();
+    });
+
+    return unsubscribe;
   }, []);
 
   useEffect(() => {

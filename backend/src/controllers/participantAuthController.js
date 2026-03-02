@@ -1,6 +1,7 @@
 const participantModel = require('../models/Participant');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const { emitGameEvent } = require("../socket");
 
 const loginController = async (req, res) => {
   try {
@@ -92,6 +93,10 @@ const registerParticipantByAdminController = async (req, res) => {
         teamId: user.teamId,
         balance: user.balance
       }
+    });
+    emitGameEvent("participant:registered", {
+      teamId: user.teamId,
+      balance: user.balance
     });
   } catch (err) {
     if (err && err.code === 11000) {

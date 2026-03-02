@@ -1,4 +1,5 @@
 const Question = require("../models/Question");
+const { emitGameEvent } = require("../socket");
 
 const addQuestionController = async (req, res) => {
   try {
@@ -56,6 +57,10 @@ const addQuestionController = async (req, res) => {
     res.status(201).json({
       message: "Question added successfully",
       question: newQuestion
+    });
+    emitGameEvent("question:added", {
+      questionId: String(newQuestion._id),
+      displayQuestionId: newQuestion.questionId
     });
   } catch (error) {
     console.log(error);

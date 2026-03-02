@@ -11,7 +11,7 @@ const adminRoutes = require('./routes/adminRoutes')
 const app = express();
 
 app.use(cors({
-  origin: "https://quiz-with-investment-hew8oc50j.vercel.app", // your frontend URL
+  origin: "https://quiz-with-investment-61keiqg4l.vercel.app/", // your frontend URL
   credentials: true
 }));
 

@@ -1,33 +1,29 @@
-const BASE_HEADERS = {
-  "Content-Type": "application/json"
-};
+import axios from "axios";
+
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
 
 async function request(path, options = {}) {
-  const response = await fetch(path, {
-    method: options.method || "GET",
-    credentials: "include",
-    headers: {
-      ...BASE_HEADERS,
-      ...(options.headers || {})
-    },
-    body: options.body ? JSON.stringify(options.body) : undefined
-  });
-
-  let data = null;
   try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
-
-  if (!response.ok) {
-    const message = data?.message || "Request failed";
+    const response = await apiClient.request({
+      url: path,
+      method: options.method || "GET",
+      data: options.body,
+      headers: options.headers || {}
+    });
+    return response.data ?? null;
+  } catch (err) {
+    const status = err?.response?.status;
+    const message = err?.response?.data?.message || "Request failed";
     const error = new Error(message);
-    error.status = response.status;
+    error.status = status;
     throw error;
   }
-
-  return data;
 }
 
 export const participantApi = {

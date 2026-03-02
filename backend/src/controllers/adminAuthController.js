@@ -1,6 +1,7 @@
 const adminModel = require("../models/Admin");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const { getAuthCookieOptions } = require("../utils/cookieOptions");
 
 /**
  * Admin Register
@@ -31,12 +32,7 @@ const adminRegisterController = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure:true,
-      sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000
-    });
+    res.cookie("token", token, getAuthCookieOptions());
 
     res.status(201).json({
       message: "Admin registered successfully",
@@ -80,12 +76,7 @@ const adminLoginController = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure:true,
-      sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000
-    });
+    res.cookie("token", token, getAuthCookieOptions());
 
     res.status(200).json({
       message: "Admin logged in successfully",

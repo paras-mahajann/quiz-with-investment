@@ -2,6 +2,7 @@ const DEFAULT_ALLOWED_ORIGINS = [
   "http://localhost:5173",
   "http://127.0.0.1:5173"
 ];
+const allowVercelPreviews = String(process.env.ALLOW_VERCEL_PREVIEWS || "").toLowerCase() === "true";
 
 const parseAllowedOrigins = () => {
   const raw = process.env.CORS_ORIGINS || "";
@@ -19,7 +20,7 @@ const isAllowedOrigin = (origin) => {
   }
 
   const normalizedOrigin = String(origin).trim();
-  if (normalizedOrigin.endsWith(".vercel.app")) {
+  if (allowVercelPreviews && normalizedOrigin.endsWith(".vercel.app")) {
     return true;
   }
 

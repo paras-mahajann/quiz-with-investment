@@ -2,6 +2,7 @@ const participantModel = require('../models/Participant');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { emitGameEvent } = require("../socket");
+const { getAuthCookieOptions } = require("../utils/cookieOptions");
 
 const loginController = async (req, res) => {
   try {
@@ -32,12 +33,7 @@ const loginController = async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure:true,
-      sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000
-    });
+    res.cookie("token", token, getAuthCookieOptions());
 
     res.status(200).json({
       message: "Logged in successfully",

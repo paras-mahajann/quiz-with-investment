@@ -11,7 +11,12 @@ const adminRoutes = require('./routes/adminRoutes')
 
 const app = express();
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: "https://quiz-with-investment.vercel.app",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.use(express.json());
 app.use(cookieParser());

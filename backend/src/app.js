@@ -11,7 +11,16 @@ const adminRoutes = require('./routes/adminRoutes')
 const app = express();
 
 app.use(cors({
-  origin: "https://quiz-with-investment-61keiqg4l.vercel.app/", // your frontend URL
+  origin: function (origin, callback) {
+    // allow requests with no origin (Postman, mobile apps)
+    if (!origin) return callback(null, true);
+
+    if (origin.endsWith(".vercel.app")) {
+      return callback(null, true);
+    }
+
+    callback(new Error("Not allowed by CORS"));
+  },
   credentials: true
 }));
 
